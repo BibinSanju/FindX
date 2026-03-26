@@ -1,6 +1,6 @@
 # FindX
 
-FindX is an enterprise RAG prototype with a FastAPI backend and a React frontend. It combines JWT authentication, MongoDB-based user storage, ChromaDB vector search, sentence-transformer embeddings, and Groq-powered answer generation.
+FindX is an enterprise agentic RAG prototype with a FastAPI backend and a React frontend. It combines JWT authentication, MongoDB-based user storage, ChromaDB vector search, sentence-transformer embeddings, and Groq-powered answer generation.
 
 The current system focuses on:
 
@@ -40,6 +40,8 @@ The main behavior is:
 - LangChain Groq integration
 - PyMuPDF
 - PyJWT
+- python-docx
+- openpyxl
 
 ### Frontend
 
@@ -78,7 +80,7 @@ React UI
 FastAPI
   -> auth validation
   -> RBAC enforcement
-  -> RAG retrieval
+  -> agentic retrieval planning and evidence selection
 MongoDB
   -> users
   -> document records
@@ -86,7 +88,7 @@ MongoDB
 ChromaDB
   -> vector chunks with metadata
 Groq LLM
-  -> grounded answer from retrieved context only
+  -> query rewriting, routing, and grounded answer generation
 ```
 
 ### Request Flow for `/api/chat`
@@ -95,11 +97,12 @@ Groq LLM
 2. FastAPI validates the JWT.
 3. Backend resolves the user scope.
 4. Backend maps role to allowed categories.
-5. ChromaDB is queried with a category filter.
-6. Retrieved chunks are ranked.
-7. If enterprise chunks are unavailable, the backend may use the legacy workspace store as a compatibility fallback.
-8. The LLM receives only the selected authorized context.
-9. Backend returns:
+5. The backend agent decides whether the request is conversational or document-grounded.
+6. For document-grounded questions, it can rewrite short follow-ups into standalone retrieval queries.
+7. ChromaDB is queried with a category filter, and multiple retrieval attempts are merged and ranked.
+8. If enterprise chunks are unavailable, the backend may use the legacy workspace store as a compatibility fallback.
+9. The LLM receives only the selected authorized context.
+10. Backend returns:
 
 ```json
 {
@@ -227,16 +230,18 @@ Responsibilities:
 
 ### `Backend/rag.py`
 
-Main enterprise RAG service.
+Main enterprise agentic RAG service.
 
 Responsibilities:
 
 - validate document categories
 - map roles to allowed categories
-- chunk and embed uploaded PDFs/PPTs
+- route conversational requests away from retrieval when appropriate
+- rewrite underspecified follow-up questions into standalone search queries
+- extract, chunk, and embed uploaded PDFs, PowerPoints, Word files, spreadsheets, and text-like files
 - store enterprise chunks in ChromaDB
 - query enterprise chunks using category filters
-- rank chunks
+- run multiple retrieval attempts and merge ranked evidence
 - gate weak results
 - call Groq with authorized context only
 - return structured answer, explanation, and sources
@@ -514,7 +519,7 @@ This was added so existing indexed content does not instantly break while the sy
 
 ### Backend Answer Prompt
 
-The backend prompt strategy in `Backend/rag.py` is intentionally strict:
+The backend prompt strategy in `Backend/rag.py` is intentionally strict even though the overall flow is now agentic:
 
 - answer only from retrieved context
 - say clearly when context is insufficient
@@ -651,6 +656,18 @@ Multipart form fields:
 - `category`
 - `sensitivity`
 - `session_id`
+
+Supported file formats:
+
+- `pdf`
+- `ppt`
+- `pptx`
+- `docx`
+- `xlsx`
+- `txt`
+- `md`
+- `csv`
+- `json`
 
 Response:
 
@@ -881,7 +898,7 @@ npm run build
 
 ## 23. Current Project Status
 
-The project is already functional as an enterprise RAG prototype with:
+The project is already functional as an enterprise agentic RAG prototype with:
 
 - login
 - role-aware search
