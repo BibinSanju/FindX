@@ -56,7 +56,7 @@ npm run dev
 ### Health Check
 
 ```powershell
-curl.exe -s http://localhost:8000/health
+curl.exe -s http://10.197.244.61:8000/health
 ```
 
 Expected result:
@@ -81,15 +81,15 @@ If you already have `ITC-Report-and-Accounts-2025.pdf` indexed, keep it for the 
 ### Login
 
 ```powershell
-$adminLogin = curl.exe -s -X POST http://localhost:8000/api/auth/login `
+$adminLogin = curl.exe -s -X POST http://10.197.244.61:8000/api/auth/login `
   -H "Content-Type: application/json" `
   -d '{"email":"admin@findx.ai","password":"admin123"}'
 
-$hrLogin = curl.exe -s -X POST http://localhost:8000/api/auth/login `
+$hrLogin = curl.exe -s -X POST http://10.197.244.61:8000/api/auth/login `
   -H "Content-Type: application/json" `
   -d '{"email":"hr@findx.ai","password":"hr123"}'
 
-$developerLogin = curl.exe -s -X POST http://localhost:8000/api/auth/login `
+$developerLogin = curl.exe -s -X POST http://10.197.244.61:8000/api/auth/login `
   -H "Content-Type: application/json" `
   -d '{"email":"developer@findx.ai","password":"developer123"}'
 ```
@@ -105,7 +105,7 @@ Check that all three responses contain:
 ```powershell
 $adminToken = ($adminLogin | ConvertFrom-Json).access_token
 
-curl.exe -s http://localhost:8000/api/auth/me `
+curl.exe -s http://10.197.244.61:8000/api/auth/me `
   -H "Authorization: Bearer $adminToken"
 ```
 
@@ -129,7 +129,7 @@ Expected result:
 ### Upload A Small File
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/upload/file `
+curl.exe -s -X POST http://10.197.244.61:8000/api/upload/file `
   -H "Authorization: Bearer $adminToken" `
   -F "file=@e:\EASA\FindX\README.md" `
   -F "category=GENERAL" `
@@ -165,7 +165,7 @@ Expected behavior:
 ### Standard Query
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"Summarize the HR leave policy.","chat_history":[]}'
@@ -180,7 +180,7 @@ Confirm:
 ### Streamed Query
 
 ```powershell
-curl.exe -N -X POST http://localhost:8000/api/chat/stream `
+curl.exe -N -X POST http://10.197.244.61:8000/api/chat/stream `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"Summarize the HR leave policy.","chat_history":[]}'
@@ -199,7 +199,7 @@ Confirm:
 Run a first query:
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"Summarize the employee probation policy.","chat_history":[]}'
@@ -208,7 +208,7 @@ curl.exe -s -X POST http://localhost:8000/api/chat `
 Then run a short follow-up with history:
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"what about extension?","chat_history":[{"role":"user","content":"Summarize the employee probation policy."},{"role":"assistant","content":"Previous grounded answer here."}]}'
@@ -222,7 +222,7 @@ Confirm:
 ### Exact-Page Retrieval
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"Explain page #205 in the ITC pdf.","chat_history":[]}'
@@ -242,7 +242,7 @@ Reject this as a failure if:
 Ask a vague but answerable question, for example:
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"What does the policy say about exceptions?","chat_history":[]}'
@@ -266,7 +266,7 @@ Confirm:
 Ask about content that is not present in any indexed document:
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/api/chat `
+curl.exe -s -X POST http://10.197.244.61:8000/api/chat `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"query":"What does the indexed data say about the Mars travel reimbursement policy?","chat_history":[]}'
@@ -295,7 +295,7 @@ This must hold both for normal retrieval and for verifier-triggered refinement.
 ### Change Visibility
 
 ```powershell
-curl.exe -s -X PATCH http://localhost:8000/api/documents/<document_id>/visibility `
+curl.exe -s -X PATCH http://10.197.244.61:8000/api/documents/<document_id>/visibility `
   -H "Authorization: Bearer $adminToken" `
   -H "Content-Type: application/json" `
   -d '{"visibility_scope":"developer"}'
@@ -309,7 +309,7 @@ Confirm:
 ### Delete A Document
 
 ```powershell
-curl.exe -s -X DELETE http://localhost:8000/api/documents/<document_id> `
+curl.exe -s -X DELETE http://10.197.244.61:8000/api/documents/<document_id> `
   -H "Authorization: Bearer $adminToken"
 ```
 

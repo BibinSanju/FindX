@@ -397,7 +397,7 @@ API base URL configuration:
 
 ```js
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+  import.meta.env.VITE_API_BASE_URL ?? 'http://10.197.244.61:8000'
 ```
 
 ### `Frontend/src/components/LoginPage.jsx`
@@ -893,7 +893,7 @@ npm run dev
 Optional frontend API override:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://10.197.244.61:8000
 ```
 
 ### Production Build
